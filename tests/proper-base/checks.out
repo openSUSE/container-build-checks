@@ -1,5 +1,5 @@
 Warning: No VENDOR defined in the configuration
-Looking at /data/obs/home:favogt:container-checks/container-build-checks/container-build-checks/tests/proper-base/proper-base.containerinfo
+Looking at proper-base.containerinfo
 Tag: foo/bar:1.2
 Tag: asdf/lol:latest
 Release: 1.2

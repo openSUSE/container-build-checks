@@ -67,7 +67,7 @@ cd "$tmpdir"
 
 # Finally, perform checks!
 for ci in "${containerinfos[@]}"; do
-	echo "Looking at $ci"
+	echo "Looking at $(basename "$ci")"
 	tags=($(jq -r '.["tags"][]' <"$ci"))
 	for tag in "${tags[@]}"; do
 		printf "Tag: %s\n" "$tag"
