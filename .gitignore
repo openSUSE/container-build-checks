@@ -1,0 +1,4 @@
+tests/*/built
+tests/*/checks.new
+tests/*/*.containerinfo
+tests/*/*.tar

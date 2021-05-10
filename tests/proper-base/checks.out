@@ -1,0 +1,8 @@
+Warning: No VENDOR defined in the configuration
+Looking at /data/obs/home:favogt:container-checks/container-build-checks/container-build-checks/tests/proper-base/proper-base.containerinfo
+Tag: foo/bar:1.2
+Tag: asdf/lol:latest
+Release: 1.2
+container-build-checks done. Hints: 0 Warnings: 1 Errors: 0
+Warnings found, but those are only fatal in certain projects.
+Exited with 0
