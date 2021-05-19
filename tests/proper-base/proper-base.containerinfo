@@ -1,0 +1,8 @@
+{
+"disturl": "obs://container:build:checks/proper-base",
+"file": "proper-base.tar",
+"repos": [{"url": "obsrepositories:/"}],
+"tags": ["foo/bar:1.2","asdf/lol:latest"],
+"release": "1.2",
+"version": "42.0"
+}

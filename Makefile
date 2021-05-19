@@ -16,23 +16,6 @@ tests/%/built: tests/%/Dockerfile
 	# Build the container
 	podman build --squash -t "c-b-c-tests/$$testname" --build-arg DISTURL="obs://container:build:checks/$$testname" .
 	podman save "c-b-c-tests/$$testname" > $$testname.tar
-	# Create containerinfo
-	tagsarr=
-	for tag in $$(awk '/^#!BuildTag/ {$$1=""; print}' Dockerfile); do
-		[ "$${tag%%:*}" = "$${tag}" ] && tag="$${tag}:latest"
-		tagsarr="$$tagsarr\"$$tag\","
-	done
-	tagsarr="$${tagsarr%%,}"
-	cat <<EOF >$$testname.containerinfo
-	{
-	"disturl": "obs://container:build:checks/$$testname",
-	"file": "$$testname.tar",
-	"repos": [{"url": "obsrepositories:/"}],
-	"tags": [$$tagsarr],
-	"release": "1.2",
-	"version": "42.0"
-	}
-	EOF
 	popd
 	touch $@
 
@@ -58,7 +41,7 @@ tests/%/regen: tests/%/built | all
 	popd
 
 clean:
-	rm -f tests/*/{built,*.containerinfo,*.tar}
+	rm -f tests/*/{built,*.tar}
 
 test: $(subst /Dockerfile,/tested,$(TESTFILES))
 test-regen: $(subst /Dockerfile,/regen,$(TESTFILES))
