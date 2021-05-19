@@ -3,10 +3,10 @@
 
 TESTFILES = $(wildcard tests/*/Dockerfile)
 
-all: container-build-checks
+all: container-build-checks.py
 
-install: container-build-checks
-	install -Dm0755 container-build-checks $(DESTDIR)/usr/lib/build/post-build-checks/
+install: container-build-checks.py
+	install -Dm0755 container-build-checks.py $(DESTDIR)/usr/lib/build/post-build-checks/
 
 tests/%/built: tests/%/Dockerfile
 	@dir=$$(dirname $^)
@@ -22,10 +22,11 @@ tests/%/built: tests/%/Dockerfile
 tests/%/tested: tests/%/built | all
 	@dir=$$(dirname $^)
 	testname=$$(basename $$dir)	
+	export CBC_CONFIG_DIR=$PWD/tests
 	pushd $$dir
 	echo "Testing $$testname"
 	ret=0
-	../../container-build-checks &>checks.new || ret=$$?
+	../../container-build-checks.py &>checks.new || ret=$$?
 	echo "Exited with $$ret" >>checks.new
 	diff -u checks.out checks.new
 	popd
@@ -33,10 +34,12 @@ tests/%/tested: tests/%/built | all
 tests/%/regen: tests/%/built | all
 	@dir=$$(dirname $^)
 	testname=$$(basename $$dir)	
+	export CBC_CONFIG_DIR=$PWD/tests
 	pushd $$dir
 	echo "Testing $$testname (regen)"
 	ret=0
-	../../container-build-checks &>checks.out || ret=$$?
+	export CBC_CONFIG_DIR=$PWD
+	../../container-build-checks.py &>checks.out || ret=$$?
 	echo "Exited with $$ret" >>checks.out
 	popd
 
