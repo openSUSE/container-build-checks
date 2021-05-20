@@ -37,14 +37,33 @@ config.read(sorted(glob.iglob(glob.escape(configdir) + "/*.conf")))
 if not config["General"]["Vendor"]:
 	warn("No Vendor defined in the configuration")
 
+def containerinfos():
+	"""Return a list of .containerinfo files to check."""
+	if "BUILD_ROOT" not in os.environ:
+		# Not running in an OBS build container
+		return glob.glob("*.containerinfo")
+
+	# Running in an OBS build container
+	buildroot=os.environ["BUILD_ROOT"]
+	topdir="/usr/src/packages"
+	if os.path.isdir(buildroot + "/.build.packages"):
+		topdir="/.build.packages"
+	if os.path.islink(buildroot + "/.build.packages"):
+		topdir="/" + os.readlink(buildroot + "/.build.packages")
+
+	return glob.glob(f"{buildroot}{topdir}/DOCKER/*.containerinfo") + \
+	       glob.glob(f"{buildroot}{topdir}/KIWI/*.containerinfo")
+
 # Do checks
-# TODO!
+for containerinfo in containerinfos():
+	print(f"Looking at {containerinfo}")
+	# TODO!
 
 # Checking done, show a summary and exit
 ret=0
 print(f"container-build-checks done. Hints: {hints} Warnings: {warnings} Errors: {errors}")
 if warnings > 0:
-	if config["General"]["FatalWarnings"]:
+	if config["General"].getboolean("FatalWarnings"):
 		print("Treating warnings as fatal due to project configuration.")
 		ret=1
 	else:

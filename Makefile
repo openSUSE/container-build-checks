@@ -6,7 +6,7 @@ TESTFILES = $(wildcard tests/*/Dockerfile)
 all: container-build-checks.py
 
 install: container-build-checks.py
-	install -Dm0755 container-build-checks.py $(DESTDIR)/usr/lib/build/post-build-checks/
+	install -Dm0755 container-build-checks.py $(DESTDIR)/usr/lib/build/post-build-checks/container-build-checks
 
 tests/%/built: tests/%/Dockerfile
 	@dir=$$(dirname $^)
@@ -28,8 +28,8 @@ tests/%/tested: tests/%/built | all
 	ret=0
 	../../container-build-checks.py &>checks.new || ret=$$?
 	echo "Exited with $$ret" >>checks.new
-	diff -u checks.out checks.new
 	popd
+	diff -u $${dir}/checks.{out,new}
 
 tests/%/regen: tests/%/built | all
 	@dir=$$(dirname $^)
@@ -44,7 +44,7 @@ tests/%/regen: tests/%/built | all
 	popd
 
 clean:
-	rm -f tests/*/{built,*.tar}
+	rm -f tests/*/{built,*.tar,checks.new}
 
 test: $(subst /Dockerfile,/tested,$(TESTFILES))
 test-regen: $(subst /Dockerfile,/regen,$(TESTFILES))
