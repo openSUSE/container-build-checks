@@ -98,7 +98,7 @@ for containerinfo in containerinfos():
 		ci_dict=json.load(cifile)
 
 	# No manually defined repos which could escape the defined paths in e.g. openSUSE:Factory
-	if ci_dict["repos"] != [{"url": "obsrepositories:/"}]:
+	if "repos" in ci_dict and ci_dict["repos"] != [{"url": "obsrepositories:/"}]:
 		urls=", ".join([repo["url"] for repo in ci_dict["repos"]])
 		warn(f"Using manually defined repositories ({urls}) in the image. Only obsrepositories:/ is allowed.")
 

@@ -8,8 +8,10 @@ all: container-build-checks.py
 install: container-build-checks.py
 	install -Dm0755 container-build-checks.py $(DESTDIR)/usr/lib/build/post-build-checks/container-build-checks
 
+tests/proper-derived/built: tests/proper-base/built
+
 tests/%/built: tests/%/Dockerfile
-	@dir=$$(dirname $^)
+	@dir=$$(dirname $@)
 	pushd $$dir
 	testname=$$(basename $$dir)
 	echo Building $$testname
@@ -20,7 +22,7 @@ tests/%/built: tests/%/Dockerfile
 	touch $@
 
 tests/%/tested: tests/%/built | all
-	@dir=$$(dirname $^)
+	@dir=$$(dirname $@)
 	testname=$$(basename $$dir)	
 	export CBC_CONFIG_DIR=$$PWD/tests
 	pushd $$dir
@@ -33,7 +35,7 @@ tests/%/tested: tests/%/built | all
 	diff -u $${dir}/checks.{out,new}
 
 tests/%/regen: tests/%/built | all
-	@dir=$$(dirname $^)
+	@dir=$$(dirname $@)
 	testname=$$(basename $$dir)	
 	export CBC_CONFIG_DIR=$$PWD/tests
 	pushd $$dir
