@@ -29,6 +29,7 @@ tests/%/tested: tests/%/built | all
 	../../container-build-checks.py &>checks.new || ret=$$?
 	echo "Exited with $$ret" >>checks.new
 	popd
+	[ -e $${dir}/checks.out ] || >$${dir}/checks.out
 	diff -u $${dir}/checks.{out,new}
 
 tests/%/regen: tests/%/built | all

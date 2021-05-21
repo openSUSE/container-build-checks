@@ -119,7 +119,9 @@ for containerinfo in containerinfos():
 		imgconfig=json.load(tar.extractfile(manifest[0]["Config"]))
 
 		# Check labels
-		labels=imgconfig["config"]["Labels"]
+		labels={}
+		if "Labels" in imgconfig["config"]:
+			labels = imgconfig["config"]["Labels"]
 
 		if ("org.openbuildservice.disturl" not in labels
 		    or labels["org.openbuildservice.disturl"] != ci_dict["disturl"]):
