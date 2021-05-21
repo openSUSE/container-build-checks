@@ -141,7 +141,7 @@ for containerinfo in containerinfos():
 		if not labelprefix:
 			warn(f"Could not determine image specific label prefix, some checks will be skipped.")
 		else:
-			print(f"Detected image specific label prefix: f{labelprefix}")
+			print(f"Detected image specific label prefix: {labelprefix}")
 
 		for labelinfo in LABEL_INFO:
 			# Are all mandatory labels present?

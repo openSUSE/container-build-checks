@@ -22,7 +22,7 @@ tests/%/built: tests/%/Dockerfile
 tests/%/tested: tests/%/built | all
 	@dir=$$(dirname $^)
 	testname=$$(basename $$dir)	
-	export CBC_CONFIG_DIR=$PWD/tests
+	export CBC_CONFIG_DIR=$$PWD/tests
 	pushd $$dir
 	echo "Testing $$testname"
 	ret=0
@@ -34,11 +34,10 @@ tests/%/tested: tests/%/built | all
 tests/%/regen: tests/%/built | all
 	@dir=$$(dirname $^)
 	testname=$$(basename $$dir)	
-	export CBC_CONFIG_DIR=$PWD/tests
+	export CBC_CONFIG_DIR=$$PWD/tests
 	pushd $$dir
 	echo "Testing $$testname (regen)"
 	ret=0
-	export CBC_CONFIG_DIR=$PWD
 	../../container-build-checks.py &>checks.out || ret=$$?
 	echo "Exited with $$ret" >>checks.out
 	popd
