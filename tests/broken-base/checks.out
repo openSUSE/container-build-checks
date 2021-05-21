@@ -1,0 +1,16 @@
+Looking at broken-base.containerinfo
+Warning: Using manually defined repositories (obsrepositories:/, obs://devel:evil/) in the image. Only obsrepositories:/ is allowed.
+Tag: opensuse/tumbleweed:latest
+Tag: opensuse/tumbleweed:20210519
+Release: 14.19
+Warning: None of the tags are unique to a specific build of the image.
+Make sure that at least one tag contains the release.
+Error: org.openbuildservice.disturl not set correctly, bug in OBS?
+Warning: Could not find prefixed copy of the org.opensuse.reference label
+Warning: Could not determine image specific label prefix, some checks will be skipped.
+Warning: Label org.opencontainers.image.vendor is not set by the image or any of its bases
+
+container-build-checks done. Hints: 0 Warnings: 5 Errors: 1
+Warnings found, but those are only fatal in certain projects.
+Fatal errors found.
+Exited with 1
