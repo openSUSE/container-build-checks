@@ -6,6 +6,7 @@ import configparser
 import glob
 import json
 import os
+import re
 import sys
 import tarfile
 
@@ -28,15 +29,18 @@ class LabelInfo:
 		return f"{self.prefix}.{self.suffix}"
 
 LABEL_INFO=[
-	LabelInfo("org.opencontainers", "image.title", True, False),
-	LabelInfo("org.opencontainers", "image.description", True, True),
-	LabelInfo("org.opencontainers", "image.version", True, True),
-	LabelInfo("org.opencontainers", "image.created", True, True),
-	LabelInfo("org.opencontainers", "image.vendor", True, False),
-	LabelInfo("org.opencontainers", "image.url", True, False),
+	LabelInfo("org.opencontainers.image", "title", True, False),
+	LabelInfo("org.opencontainers.image", "description", True, True),
+	LabelInfo("org.opencontainers.image", "version", True, True),
+	LabelInfo("org.opencontainers.image", "created", True, True),
+	LabelInfo("org.opencontainers.image", "vendor", True, False),
+	LabelInfo("org.opencontainers.image", "url", True, False),
 	LabelInfo("org.openbuildservice", "disturl", True, True),
 	LabelInfo("org.opensuse", "reference", True, True),
 	]
+
+# Split a reference (e.g. registry.opensuse.org/foo/bar:tag01) into (registry, repo, tag)
+REFERENCE_RE=re.compile("([^/]+)/([^/]+(?:/[^/]+)*):([^:]+)")
 
 # Counters shown at the end
 hints=0
@@ -61,11 +65,14 @@ def error(msg):
 # Load the configuration
 configdir=os.environ.get("CBC_CONFIG_DIR", "/usr/share/container-build-checks/")
 config=configparser.ConfigParser()
-config.read_dict({"General": {"FatalWarnings": False, "Vendor": ""}})
+config.read_dict({"General": {"FatalWarnings": False, "Vendor": "", "Registry": ""}})
 config.read(sorted(glob.iglob(glob.escape(configdir) + "/*.conf")))
 
 if not config["General"]["Vendor"]:
 	warn("No Vendor defined in the configuration")
+
+if not config["General"]["Registry"]:
+	hint("No Registry defined in the configuration")
 
 def containerinfos():
 	"""Return a list of .containerinfo files to check."""
@@ -131,6 +138,21 @@ for containerinfo in containerinfos():
 		labelprefix=None
 		if "org.opensuse.reference" in labels:
 			reference=labels["org.opensuse.reference"]
+			reference_match=REFERENCE_RE.fullmatch(reference)
+			# Verify org.opensuse.reference matches
+			if reference_match is None:
+				error(f"The value of the org.opensuse.reference label ({reference}) is invalid")
+			else:
+				(registry, repo, tag) = reference_match.groups()
+				if config["General"]["Registry"] and registry != config["General"]["Registry"]:
+					warn(f"The org.opensuse.reference label ({reference}) does not refer to {config['General']['Registry']}")
+
+				if f"{repo}:{tag}" not in ci_dict["tags"]:
+					tags=", ".join(ci_dict["tags"])
+					warn(f"The org.opensuse.reference label ({reference}) does not refer to an existing tag ({tags})")
+				elif ci_dict["release"] not in tag:
+					warn(f"The org.opensuse.reference label ({reference}) does not refer to a tag identifying a specific build")
+
 			reference_labels=[name for (name, value) in labels.items() if name != "org.opensuse.reference" and name.endswith(".reference") and value == reference]
 
 			if len(reference_labels) == 0:
@@ -150,6 +172,18 @@ for containerinfo in containerinfos():
 			if labelinfo.mandatory and labelinfo.oci() not in labels:
 				warn(f"Label {labelinfo.oci()} is not set by the image or any of its bases")
 				continue
+
+			# Check prefixed labels
+			if labelprefix:
+				if f"{labelprefix}.{labelinfo.suffix}" in labels:
+					if labelinfo.oci() not in labels:
+						warn(f"Label {labelprefix}.{labelinfo.suffix} set but not {labelinfo.oci()}")
+					elif labels[labelinfo.oci()] != labels[f"{labelprefix}.{labelinfo.suffix}"]:
+						warn(f"Label {labelprefix}.{labelinfo.suffix} not identical to {labelinfo.oci()}")
+				elif labelinfo.mandatory_derived:
+					warn(f"Labels {labelinfo.oci()} and {labelprefix}.{labelinfo.suffix} not specified by this image")
+				#else:
+					# TODO: Verify content
 
 		# TODO: Finish label checks
 

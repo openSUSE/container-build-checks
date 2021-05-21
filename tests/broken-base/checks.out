@@ -6,11 +6,13 @@ Release: 14.19
 Warning: None of the tags are unique to a specific build of the image.
 Make sure that at least one tag contains the release.
 Error: org.openbuildservice.disturl not set correctly, bug in OBS?
+Warning: The org.opensuse.reference label (notregistry.opensuse.org/opensuse/nottumbleweed:latest) does not refer to registry.opensuse.org
+Warning: The org.opensuse.reference label (notregistry.opensuse.org/opensuse/nottumbleweed:latest) does not refer to an existing tag (opensuse/tumbleweed:latest, opensuse/tumbleweed:20210519)
 Warning: Could not find prefixed copy of the org.opensuse.reference label
 Warning: Could not determine image specific label prefix, some checks will be skipped.
 Warning: Label org.opencontainers.image.vendor is not set by the image or any of its bases
 
-container-build-checks done. Hints: 0 Warnings: 5 Errors: 1
+container-build-checks done. Hints: 0 Warnings: 7 Errors: 1
 Warnings found, but those are only fatal in certain projects.
 Fatal errors found.
 Exited with 1

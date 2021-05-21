@@ -5,5 +5,5 @@ LABEL org.opencontainers.image.description="Not an image containing a minimal en
 LABEL org.opencontainers.image.title="Not openSUSE Tumbleweed Base Container"
 LABEL org.opencontainers.image.url="not a url"
 LABEL org.opencontainers.image.version="20210519"
-LABEL org.opensuse.reference="registry.opensuse.org/opensuse/nottumbleweed:latest"
+LABEL org.opensuse.reference="notregistry.opensuse.org/opensuse/nottumbleweed:latest"
 COPY some-file /some-file
