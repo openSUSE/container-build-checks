@@ -4,13 +4,13 @@ Warning: None of the tags are unique to a specific build of the image.
 Make sure that at least one tag contains the release.
 Error: org.openbuildservice.disturl not set correctly, bug in OBS?
 Warning: Could not determine image specific label prefix, some checks will be skipped.
+Warning: Label org.openbuildservice.disturl is not set by the image or any of its bases
 Warning: Label org.opencontainers.image.title is not set by the image or any of its bases
 Warning: Label org.opencontainers.image.description is not set by the image or any of its bases
 Warning: Label org.opencontainers.image.version is not set by the image or any of its bases
 Warning: Label org.opencontainers.image.created is not set by the image or any of its bases
 Warning: Label org.opencontainers.image.vendor is not set by the image or any of its bases
 Warning: Label org.opencontainers.image.url is not set by the image or any of its bases
-Warning: Label org.openbuildservice.disturl is not set by the image or any of its bases
 Warning: Label org.opensuse.reference is not set by the image or any of its bases
 
 container-build-checks done. Hints: 0 Warnings: 10 Errors: 1
