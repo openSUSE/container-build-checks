@@ -42,25 +42,26 @@ LABEL_INFO=[
 # Split a reference (e.g. registry.opensuse.org/foo/bar:tag01) into (registry, repo, tag)
 REFERENCE_RE=re.compile("([^/]+)/([^/]+(?:/[^/]+)*):([^:]+)")
 
-# Counters shown at the end
-hints=0
-warnings=0
-errors=0
+class CheckResult:
+	"""Class to track count of issues"""
+	def __init__(self):
+		self.hints=0
+		self.warnings=0
+		self.errors=0
 
-def hint(msg):
-	global hints
-	print("Hint: %s" % msg)
-	hints+=1
+	def hint(self, msg):
+		print(f"Hint: {msg}")
+		self.hints+=1
 
-def warn(msg):
-	global warnings
-	print("Warning: %s" % msg)
-	warnings+=1
+	def warn(self, msg):
+		print(f"Warning: {msg}")
+		self.warnings+=1
 
-def error(msg):
-	global errors
-	print("Error: %s" % msg)
-	errors+=1
+	def error(self, msg):
+		print(f"Error: {msg}")
+		self.errors+=1
+
+result=CheckResult()
 
 # Load the configuration
 configdir=os.environ.get("CBC_CONFIG_DIR", "/usr/share/container-build-checks/")
@@ -69,10 +70,10 @@ config.read_dict({"General": {"FatalWarnings": False, "Vendor": "", "Registry": 
 config.read(sorted(glob.iglob(glob.escape(configdir) + "/*.conf")))
 
 if not config["General"]["Vendor"]:
-	warn("No Vendor defined in the configuration")
+	result.warn("No Vendor defined in the configuration")
 
 if not config["General"]["Registry"]:
-	hint("No Registry defined in the configuration")
+	result.hint("No Registry defined in the configuration")
 
 def containerinfos():
 	"""Return a list of .containerinfo files to check."""
@@ -100,21 +101,21 @@ for containerinfo in containerinfos():
 	# No manually defined repos which could escape the defined paths in e.g. openSUSE:Factory
 	if "repos" in ci_dict and ci_dict["repos"] != [{"url": "obsrepositories:/"}]:
 		urls=", ".join([repo["url"] for repo in ci_dict["repos"]])
-		warn(f"Using manually defined repositories ({urls}) in the image. Only obsrepositories:/ is allowed.")
+		result.warn(f"Using manually defined repositories ({urls}) in the image. Only obsrepositories:/ is allowed.")
 
 	# Make sure tags are namespaced and one of them contains the release
 	releasetagfound=False
 	for tag in ci_dict["tags"]:
 		print(f"Tag: {tag}")
 		if "/" not in tag:
-			warn(f"Tag {tag} is not namespaced (e.g. opensuse/foo)")
+			result.warn(f"Tag {tag} is not namespaced (e.g. opensuse/foo)")
 		if ci_dict["release"] in tag:
 			releasetagfound=True
 
 	print(f"Release: {ci_dict['release']}")
 
 	if not releasetagfound:
-		warn(f"None of the tags are unique to a specific build of the image.\nMake sure that at least one tag contains the release.")
+		result.warn(f"None of the tags are unique to a specific build of the image.\nMake sure that at least one tag contains the release.")
 
 	# Now open the tarball and look inside
 	dir=os.path.dirname(os.path.realpath(containerinfo))
@@ -132,7 +133,7 @@ for containerinfo in containerinfos():
 
 		if ("org.openbuildservice.disturl" not in labels
 		    or labels["org.openbuildservice.disturl"] != ci_dict["disturl"]):
-			error("org.openbuildservice.disturl not set correctly, bug in OBS?")
+			result.error("org.openbuildservice.disturl not set correctly, bug in OBS?")
 
 		# Get the image specific label prefix by looking at the .reference
 		labelprefix=None
@@ -145,43 +146,43 @@ for containerinfo in containerinfos():
 			else:
 				(registry, repo, tag) = reference_match.groups()
 				if config["General"]["Registry"] and registry != config["General"]["Registry"]:
-					warn(f"The org.opensuse.reference label ({reference}) does not refer to {config['General']['Registry']}")
+					result.warn(f"The org.opensuse.reference label ({reference}) does not refer to {config['General']['Registry']}")
 
 				if f"{repo}:{tag}" not in ci_dict["tags"]:
 					tags=", ".join(ci_dict["tags"])
-					warn(f"The org.opensuse.reference label ({reference}) does not refer to an existing tag ({tags})")
+					result.warn(f"The org.opensuse.reference label ({reference}) does not refer to an existing tag ({tags})")
 				elif ci_dict["release"] not in tag:
-					warn(f"The org.opensuse.reference label ({reference}) does not refer to a tag identifying a specific build")
+					result.warn(f"The org.opensuse.reference label ({reference}) does not refer to a tag identifying a specific build")
 
 			reference_labels=[name for (name, value) in labels.items() if name != "org.opensuse.reference" and name.endswith(".reference") and value == reference]
 
 			if len(reference_labels) == 0:
-				warn(f"Could not find prefixed copy of the org.opensuse.reference label")
+				result.warn(f"Could not find prefixed copy of the org.opensuse.reference label")
 			elif len(reference_labels) > 1:
-				warn(f"Unable to find which of those labels is the one corresponding to this image: f{reference_labels}")
+				result.warn(f"Unable to find which of those labels is the one corresponding to this image: f{reference_labels}")
 			else:
 				labelprefix=reference_labels[0][0:-len(".reference")]
 
 		if not labelprefix:
-			warn(f"Could not determine image specific label prefix, some checks will be skipped.")
+			result.warn(f"Could not determine image specific label prefix, some checks will be skipped.")
 		else:
 			print(f"Detected image specific label prefix: {labelprefix}")
 
 		for labelinfo in LABEL_INFO:
 			# Are all mandatory labels present?
 			if labelinfo.mandatory and labelinfo.oci() not in labels:
-				warn(f"Label {labelinfo.oci()} is not set by the image or any of its bases")
+				result.warn(f"Label {labelinfo.oci()} is not set by the image or any of its bases")
 				continue
 
 			# Check prefixed labels
 			if labelprefix:
 				if f"{labelprefix}.{labelinfo.suffix}" in labels:
 					if labelinfo.oci() not in labels:
-						warn(f"Label {labelprefix}.{labelinfo.suffix} set but not {labelinfo.oci()}")
+						result.warn(f"Label {labelprefix}.{labelinfo.suffix} set but not {labelinfo.oci()}")
 					elif labels[labelinfo.oci()] != labels[f"{labelprefix}.{labelinfo.suffix}"]:
-						warn(f"Label {labelprefix}.{labelinfo.suffix} not identical to {labelinfo.oci()}")
+						result.warn(f"Label {labelprefix}.{labelinfo.suffix} not identical to {labelinfo.oci()}")
 				elif labelinfo.mandatory_derived:
-					warn(f"Labels {labelinfo.oci()} and {labelprefix}.{labelinfo.suffix} not specified by this image")
+					result.warn(f"Labels {labelinfo.oci()} and {labelprefix}.{labelinfo.suffix} not specified by this image")
 				#else:
 					# TODO: Verify content
 
@@ -193,15 +194,15 @@ for containerinfo in containerinfos():
 
 # Checking done, show a summary and exit
 ret=0
-print(f"container-build-checks done. Hints: {hints} Warnings: {warnings} Errors: {errors}")
-if warnings > 0:
+print(f"container-build-checks done. Hints: {result.hints} Warnings: {result.warnings} Errors: {result.errors}")
+if result.warnings > 0:
 	if config["General"].getboolean("FatalWarnings"):
 		print("Treating warnings as fatal due to project configuration.")
 		ret=1
 	else:
 		print("Warnings found, but those are only fatal in certain projects.")
 
-if errors > 0:
+if result.errors > 0:
 	print("Fatal errors found.")
 	ret=1
 
