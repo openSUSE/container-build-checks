@@ -147,7 +147,9 @@ def check_labels(image, result):
     labelprefix = None
     if "org.opensuse.reference" in labels:
         reference = labels["org.opensuse.reference"]
-        reference_labels = [name for (name, value) in labels.items() if name != "org.opensuse.reference" and name.endswith(".reference") and value == reference]
+        reference_labels = [name for (name, value) in labels.items() if value == reference]
+        reference_labels = [name for name in reference_labels
+                            if name != "org.opensuse.reference" and name.endswith(".reference")]
 
         if len(reference_labels) == 0:
             result.warn("Could not find prefixed copy of the org.opensuse.reference label")
