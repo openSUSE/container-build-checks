@@ -1,3 +1,5 @@
+# Each recipe is a bash script
+SHELL = /bin/bash
 .ONESHELL:
 .SHELLFLAGS = -ec
 
