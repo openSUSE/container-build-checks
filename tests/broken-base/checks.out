@@ -1,8 +1,8 @@
 Looking at broken-base.containerinfo
 Warning: Using manually defined repositories (obsrepositories:/, obs://devel:evil/) in the image. Only obsrepositories:/ is allowed.
+Release: 14.19
 Tag: opensuse/tumbleweed:latest
 Tag: opensuse/tumbleweed:20210519
-Release: 14.19
 Warning: None of the tags are unique to a specific build of the image.
 Make sure that at least one tag contains the release.
 Warning: Could not find prefixed copy of the org.opensuse.reference label

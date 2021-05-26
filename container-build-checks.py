@@ -54,22 +54,20 @@ REFERENCE_RE = re.compile("([^/]+)/([^:]+):([^:]+)")
 
 
 def verify_reference(image, result, value):
-    reference = value
-    reference_match = REFERENCE_RE.fullmatch(reference)
-    # Verify org.opensuse.reference matches
+    reference_match = REFERENCE_RE.fullmatch(value)
     if reference_match is None:
-        result.error(f"The value of the org.opensuse.reference label ({reference}) is invalid")
+        result.error(f"The value of the org.opensuse.reference label ({value}) is invalid")
         return
 
     (registry, repo, tag) = reference_match.groups()
     if config["General"]["Registry"] and registry != config["General"]["Registry"]:
-        result.warn(f"The org.opensuse.reference label ({reference}) does not refer to {config['General']['Registry']}")
+        result.warn(f"The org.opensuse.reference label ({value}) does not refer to {config['General']['Registry']}")
 
         if f"{repo}:{tag}" not in image.containerinfo["tags"]:
             tags = ", ".join(image.containerinfo["tags"])
-            result.warn(f"The org.opensuse.reference label ({reference}) does not refer to an existing tag ({tags})")
+            result.warn(f"The org.opensuse.reference label ({value}) does not refer to an existing tag ({tags})")
         elif image.containerinfo["release"] not in tag:
-            result.warn(f"The org.opensuse.reference label ({reference}) does not refer to a tag identifying a specific build")
+            result.warn(f"The org.opensuse.reference label ({value}) does not refer to a tag identifying a specific build")
 
 
 LABEL_INFO = [
@@ -123,6 +121,7 @@ def containerinfos():
 
 
 def check_labels(image, result):
+    """Verify labels and their content"""
     labels = image.config.get("config", {}).get("Labels", {})
 
     # Treat this specially, it is usually not set manually
@@ -155,7 +154,7 @@ def check_labels(image, result):
             result.warn(f"Label {labelinfo.oci()} is not set by the image or any of its bases")
             continue
 
-        if labelinfo.verifier:
+        if labelinfo.oci() in labels and labelinfo.verifier:
             labelinfo.verifier(image, result, labels[labelinfo.oci()])
 
         # Check prefixed labels
@@ -177,6 +176,7 @@ def check_image(image, result):
         result.warn(f"Using manually defined repositories ({urls}) in the image. Only obsrepositories:/ is allowed.")
 
     # Make sure tags are namespaced and one of them contains the release
+    print(f"Release: {image.containerinfo['release']}")
     releasetagfound = False
     for tag in image.containerinfo["tags"]:
         print(f"Tag: {tag}")
@@ -184,8 +184,6 @@ def check_image(image, result):
             result.warn(f"Tag {tag} is not namespaced (e.g. opensuse/foo)")
         if image.containerinfo["release"] in tag:
             releasetagfound = True
-
-    print(f"Release: {image.containerinfo['release']}")
 
     if not releasetagfound:
         result.warn("None of the tags are unique to a specific build of the image.\n" +
