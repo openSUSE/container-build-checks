@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import configparser
-import contextlib
 import glob
 import json
 import os
@@ -14,27 +13,14 @@ import tarfile
 
 class Image:
     """Information about the image to be tested."""
-    def __init__(self, containerinfo, tarfile, config):
+    def __init__(self, containerinfo, tarfile):
         self.containerinfo = containerinfo
         self.tarfile = tarfile
-        self.config = config
-
-
-@contextlib.contextmanager
-def image_from_containerinfo(path):
-    """Create an Image instance for the .containerinfo file in path."""
-    with open(path, "rb") as cifile:
-        ci_dict = json.load(cifile)
-
-    # Open the tarball and look inside
-    dir = os.path.dirname(os.path.realpath(path))
-    with tarfile.open(f"{dir}/{ci_dict['file']}") as tar:
-        manifest = json.load(tar.extractfile("manifest.json"))
-        if len(manifest) != 1:
+        self.manifest = json.load(tar.extractfile("manifest.json"))
+        if len(self.manifest) != 1:
             raise Exception("Manifest doesn't have exactly one entry")
 
-        imgconfig = json.load(tar.extractfile(manifest[0]["Config"]))
-        yield Image(ci_dict, tar, imgconfig)
+        self.config = json.load(self.tarfile.extractfile(self.manifest[0]["Config"]))
 
 
 class LabelInfo:
@@ -225,7 +211,13 @@ if not config["General"]["Registry"]:
 # Do checks
 for containerinfo in containerinfos():
     print(f"Looking at {containerinfo}")
-    with image_from_containerinfo(containerinfo) as image:
+    with open(containerinfo, "rb") as cifile:
+        ci_dict = json.load(cifile)
+
+    # Open the tarball and look inside
+    dir = os.path.dirname(os.path.realpath(containerinfo))
+    with tarfile.open(f"{dir}/{ci_dict['file']}") as tar:
+        image = Image(ci_dict, tar)
         check_image(image, result)
         print()
 
