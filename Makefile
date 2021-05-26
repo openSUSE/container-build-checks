@@ -12,25 +12,25 @@ tests/proper-derived/built: tests/proper-base/built
 
 tests/%/built: tests/%/Dockerfile
 	@dir=$$(dirname $@)
-	pushd $$dir
+	pushd $$dir >/dev/null
 	testname=$$(basename $$dir)
 	echo Building $$testname
 	# Build the container
 	podman build --squash -t "c-b-c-tests/$$testname" --build-arg DISTURL="obs://container:build:checks/$$testname" .
 	podman save "c-b-c-tests/$$testname" > $$testname.tar
-	popd
+	popd >/dev/null
 	touch $@
 
 tests/%/tested: tests/%/built | all
 	@dir=$$(dirname $@)
 	testname=$$(basename $$dir)	
 	export CBC_CONFIG_DIR=$$PWD/tests
-	pushd $$dir
+	pushd $$dir >/dev/null
 	echo "Testing $$testname"
 	ret=0
 	../../container-build-checks.py &>checks.new || ret=$$?
 	echo "Exited with $$ret" >>checks.new
-	popd
+	popd >/dev/null
 	[ -e $${dir}/checks.out ] || >$${dir}/checks.out
 	diff -u $${dir}/checks.{out,new}
 
@@ -38,12 +38,12 @@ tests/%/regen: tests/%/built | all
 	@dir=$$(dirname $@)
 	testname=$$(basename $$dir)	
 	export CBC_CONFIG_DIR=$$PWD/tests
-	pushd $$dir
+	pushd $$dir >/dev/null
 	echo "Testing $$testname (regen)"
 	ret=0
 	../../container-build-checks.py &>checks.out || ret=$$?
 	echo "Exited with $$ret" >>checks.out
-	popd
+	popd >/dev/null
 
 clean:
 	rm -f tests/*/{built,*.tar,checks.new}
