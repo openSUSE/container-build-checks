@@ -67,7 +67,8 @@ def verify_reference(image, result, value):
             tags = ", ".join(image.containerinfo["tags"])
             result.warn(f"The org.opensuse.reference label ({value}) does not refer to an existing tag ({tags})")
         elif image.containerinfo["release"] not in tag:
-            result.warn(f"The org.opensuse.reference label ({value}) does not refer to a tag identifying a specific build")
+            result.warn(f"The org.opensuse.reference label ({value}) does not refer "
+                        f"to a tag identifying a specific build")
 
 
 LABEL_INFO = [
@@ -139,7 +140,8 @@ def check_labels(image, result):
         if len(reference_labels) == 0:
             result.warn("Could not find prefixed copy of the org.opensuse.reference label")
         elif len(reference_labels) > 1:
-            result.warn(f"Unable to find which of those labels is the one corresponding to this image: {reference_labels}")
+            result.warn(f"Unable to find which of those labels is the one corresponding "
+                        f"to this image: {reference_labels}")
         else:
             labelprefix = reference_labels[0][0:-len(".reference")]
 
@@ -165,7 +167,8 @@ def check_labels(image, result):
                 elif labels[labelinfo.oci()] != labels[f"{labelprefix}.{labelinfo.suffix}"]:
                     result.warn(f"Label {labelprefix}.{labelinfo.suffix} not identical to {labelinfo.oci()}")
             elif labelinfo.mandatory_derived:
-                result.warn(f"Labels {labelinfo.oci()} and {labelprefix}.{labelinfo.suffix} not specified by this image")
+                result.warn(f"Labels {labelinfo.oci()} and {labelprefix}.{labelinfo.suffix} "
+                            f"not specified by this image")
 
 
 def check_image(image, result):

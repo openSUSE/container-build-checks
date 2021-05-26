@@ -8,6 +8,7 @@ all: container-build-checks.py
 install: container-build-checks.py
 	install -Dm0755 container-build-checks.py $(DESTDIR)/usr/lib/build/post-build-checks/container-build-checks
 
+# Some test containers depend on other test containers. Make sure those are built first.
 tests/proper-derived/built: tests/proper-base/built
 
 tests/%/built: tests/%/Dockerfile
@@ -44,6 +45,9 @@ tests/%/regen: tests/%/built | all
 	../../container-build-checks.py &>checks.out || ret=$$?
 	echo "Exited with $$ret" >>checks.out
 	popd >/dev/null
+
+lint: container-build-checks.py
+	flake8 $^ --max-line-length=120
 
 clean:
 	rm -f tests/*/{built,*.tar,checks.new}
