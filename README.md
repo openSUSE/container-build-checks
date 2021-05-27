@@ -22,6 +22,8 @@ To run it against built containers outside of OBS, it's necessary to craft a .co
 }
 ```
 
+When called outside of OBS, it looks at all `*.containerinfo` files in the current directory.
+
 Configuration
 =============
 
