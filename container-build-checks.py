@@ -150,6 +150,9 @@ def check_labels(image, result):
     else:
         print(f"Detected image specific label prefix: {labelprefix}")
 
+        if config["General"]["Vendor"] and not labelprefix.startswith(f"{config['General']['Vendor']}."):
+            result.warn(f"Label prefix doesn't start with {config['General']['Vendor']}")
+
     for labelinfo in LABEL_INFO:
         # Are all mandatory labels present?
         if labelinfo.mandatory and labelinfo.oci() not in labels:
