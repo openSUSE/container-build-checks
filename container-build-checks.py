@@ -63,12 +63,12 @@ def verify_reference(image, result, value):
     if config["General"]["Registry"] and registry != config["General"]["Registry"]:
         result.warn(f"The org.opensuse.reference label ({value}) does not refer to {config['General']['Registry']}")
 
-        if f"{repo}:{tag}" not in image.containerinfo["tags"]:
-            tags = ", ".join(image.containerinfo["tags"])
-            result.warn(f"The org.opensuse.reference label ({value}) does not refer to an existing tag ({tags})")
-        elif image.containerinfo["release"] not in tag:
-            result.warn(f"The org.opensuse.reference label ({value}) does not refer "
-                        f"to a tag identifying a specific build")
+    if f"{repo}:{tag}" not in image.containerinfo["tags"]:
+        tags = ", ".join(image.containerinfo["tags"])
+        result.warn(f"The org.opensuse.reference label ({value}) does not refer to an existing tag ({tags})")
+    elif image.containerinfo["release"] not in tag:
+        result.warn(f"The org.opensuse.reference label ({value}) does not refer "
+                    f"to a tag identifying a specific build")
 
 
 LABEL_INFO = [
