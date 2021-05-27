@@ -1,0 +1,20 @@
+{
+   "buildtime" : 1621607310,
+   "disturl" : "obs://build.opensuse.org/home:favogt:container-checks/containerfile/e6f02b3d61214e205f11d1c2075b14cc-dockerfile-application-container",
+   "file" : "broken-derived.tar",
+   "goarch" : "amd64",
+   "goos" : "linux",
+   "imageid" : "df309d498c093685243d9d945f368076d88bb6bd181640fae752bf800c3cef09",
+   "release" : "7.21",
+   "repos" : [
+      {
+         "url" : "not obsrepositories:/"
+      }
+   ],
+   "tags" : [
+      "example:latest",
+      "opensuse/example:5.7",
+      "opensuse/example:5.7.7.21"
+   ],
+   "version" : "5.7"
+}
