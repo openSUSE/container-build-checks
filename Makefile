@@ -13,17 +13,19 @@ install: container-build-checks.py
 # Some test containers depend on other test containers. Make sure those are built first.
 tests/proper-derived/built: tests/proper-base/built
 
+# Build the Dockerfile and create the tarball
 tests/%/built: tests/%/Dockerfile
 	@dir=$$(dirname $@)
 	pushd $$dir >/dev/null
 	testname=$$(basename $$dir)
 	echo Building $$testname
 	# Build the container
-	podman build --squash -t "c-b-c-tests/$$testname" --build-arg DISTURL="obs://container:build:checks/$$testname" .
+	podman build --squash -t "c-b-c-tests/$$testname" .
 	podman save "c-b-c-tests/$$testname" > $$testname.tar
 	popd >/dev/null
 	touch $@
 
+# Run c-b-c on the built image, compare output against checks.out
 tests/%/tested: tests/%/built | all
 	@dir=$$(dirname $@)
 	testname=$$(basename $$dir)	
@@ -37,6 +39,7 @@ tests/%/tested: tests/%/built | all
 	[ -e $${dir}/checks.out ] || >$${dir}/checks.out
 	diff -u $${dir}/checks.{out,new}
 
+# Run c-b-c on the built image, save output as checks.out
 tests/%/regen: tests/%/built | all
 	@dir=$$(dirname $@)
 	testname=$$(basename $$dir)	
@@ -54,7 +57,9 @@ lint: container-build-checks.py
 clean:
 	rm -f tests/*/{built,*.tar,checks.new}
 
+# Run all tests
 test: $(subst /Dockerfile,/tested,$(TESTFILES))
+# Run all tests, update checks.out
 test-regen: $(subst /Dockerfile,/regen,$(TESTFILES))
 
 .PRECIOUS: $(subst /Dockerfile,/built,$(TESTFILES))
