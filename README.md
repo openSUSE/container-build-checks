@@ -1,4 +1,4 @@
-openSUSE Container Build Checks ![Hopefully green test status](https://github.com/Vogtinator/container-build-checks/actions/workflows/test.yml/badge.svg?branch=master)
+openSUSE Container Build Checks ![Hopefully green test status](https://github.com/openSUSE/container-build-checks/actions/workflows/test.yml/badge.svg?branch=master)
 ===============================
 
 This tool checks that built container images conform to the openSUSE container image policies (https://en.opensuse.org/Building_derived_containers).
