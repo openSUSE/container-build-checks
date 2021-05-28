@@ -39,6 +39,12 @@ FatalWarnings=false
 Vendor=
 # If set, verify that the org.opensuse.reference value uses this as registry
 Registry=
+
+[Tags]
+# All tags have to match one of the patterns, e.g. opensuse/*,kubic/*
+Allowed+=
+# Tags must not match any of the patterns in here.
+Blocked+=
 ```
 
 Testing

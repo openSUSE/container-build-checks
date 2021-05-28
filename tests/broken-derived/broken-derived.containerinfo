@@ -12,7 +12,8 @@
       }
    ],
    "tags" : [
-      "example:latest",
+      "naughty:latest",
+      "notallowed/either:latest",
       "opensuse/example:5.7",
       "opensuse/example:5.7.7.21"
    ],

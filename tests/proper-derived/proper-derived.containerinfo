@@ -14,7 +14,8 @@
    "tags" : [
       "opensuse/example:latest",
       "opensuse/example:5.7",
-      "opensuse/example:5.7.7.21"
+      "opensuse/example:5.7.7.21",
+      "kubic/testtag:latest"
    ],
    "tar_blobids" : [
       "sha256:43e763c1a9ac8eaa809d77c4ad0c543d78a826ba9d811eae19624c31e799fd1c",

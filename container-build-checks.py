@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import configparser
+import fnmatch
 import glob
 import json
 import os
@@ -174,6 +175,14 @@ def check_labels(image, result):
                             f"not specified by this image")
 
 
+def match_patterns(needle, patterns):
+    """Runs fnmatch.fnmatchcase against each pattern in patterns and returns
+    the first pattern which matches."""
+    for pattern in patterns:
+        if fnmatch.fnmatchcase(needle, pattern):
+            return pattern
+
+
 def check_image(image, result):
     """Perform checks on the given image"""
     # No manually defined repos which could escape the defined paths in e.g. openSUSE:Factory
@@ -184,10 +193,19 @@ def check_image(image, result):
     # Make sure tags are namespaced and one of them contains the release
     print(f"Release: {image.containerinfo['release']}")
     releasetagfound = False
+
+    allowed_tags = config["Tags"].getlist("Allowed")
+    blocked_tags = config["Tags"].getlist("Blocked")
     for tag in image.containerinfo["tags"]:
         print(f"Tag: {tag}")
-        if "/" not in tag:
-            result.warn(f"Tag {tag} is not namespaced (e.g. opensuse/foo)")
+
+        if allowed_tags and not match_patterns(tag, allowed_tags):
+            result.warn(f"Tag {tag} is not allowed. Allowed patterns: {', '.join(allowed_tags)}.")
+
+        blocked_pattern = match_patterns(tag, blocked_tags)
+        if blocked_pattern is not None:
+            result.warn(f"Tag {tag} is not allowed (blocked by {blocked_pattern}).")
+
         if image.containerinfo["release"] in tag:
             releasetagfound = True
 
@@ -198,12 +216,36 @@ def check_image(image, result):
     check_labels(image, result)
 
 
+class AppendInterpolation(configparser.Interpolation):
+    """Allow key+=value syntax to append ,-delimited values.
+       Use with converters={"list": lambda x: x.split(",")} to allow
+       config.getlist("foo")."""
+    def before_read(self, parser, section, option, value):
+        if option.endswith("+"):
+            key = option[:-1]
+            if key in parser[section] and parser[section][key]:
+                current = parser[section][key]
+                # configparser might not be done flattening it
+                if isinstance(current, list):
+                    current = ",".join(current)
+
+                # This may be called multiple times for the same value,
+                # so drop duplicate elements.
+                value = ",".join(sorted(set(current.split(",") + value.split(","))))
+
+            parser.set(section, key, value)
+
+        return value
+
+
 result = CheckResult()
 
 # Load the configuration
 configdir = os.environ.get("CBC_CONFIG_DIR", "/usr/share/container-build-checks/")
-config = configparser.ConfigParser()
-config.read_dict({"General": {"FatalWarnings": False, "Vendor": "", "Registry": ""}})
+config = configparser.RawConfigParser(interpolation=AppendInterpolation(),
+                                      converters={"list": lambda x: list(filter(None, x.split(",")))})
+config.read_dict({"General": {"FatalWarnings": False, "Vendor": "", "Registry": ""},
+                  "Tags": {"Allowed": "", "Blocked": ""}})
 config.read(sorted(glob.iglob(glob.escape(configdir) + "/*.conf")))
 
 if not config["General"]["Vendor"]:

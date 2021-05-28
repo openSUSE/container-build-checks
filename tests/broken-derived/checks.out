@@ -1,8 +1,11 @@
 Looking at broken-derived.containerinfo
 Warning: Using manually defined repositories (not obsrepositories:/) in the image. Only obsrepositories:/ is allowed.
 Release: 7.21
-Tag: example:latest
-Warning: Tag example:latest is not namespaced (e.g. opensuse/foo)
+Tag: naughty:latest
+Warning: Tag naughty:latest is not allowed. Allowed patterns: kubic/*, opensuse/*.
+Warning: Tag naughty:latest is not allowed (blocked by naughty*).
+Tag: notallowed/either:latest
+Warning: Tag notallowed/either:latest is not allowed. Allowed patterns: kubic/*, opensuse/*.
 Tag: opensuse/example:5.7
 Tag: opensuse/example:5.7.7.21
 Detected image specific label prefix: com.opensuse.example
@@ -13,6 +16,6 @@ Warning: Label com.opensuse.example.description not identical to org.opencontain
 Warning: Labels org.opencontainers.image.version and com.opensuse.example.version not specified by this image
 Warning: The org.opensuse.reference label (registry.opensuse.org/opensuse/example:5.7) does not refer to a tag identifying a specific build
 
-container-build-checks done. Hints: 0 Warnings: 8 Errors: 0
+container-build-checks done. Hints: 0 Warnings: 10 Errors: 0
 Warnings found, but those are only fatal in certain projects.
 Exited with 0
