@@ -70,3 +70,8 @@ LABEL statements can be created from an existing image by running:
 `podman image inspect foo | jq '.[0]["Config"]["Labels"]' | sed 's/": /=/g;s/^  "/LABEL /g;s/,$//g'`
 
 Run `make test` (or just `make tests/foo/tested`) to see the output and `make test-regen` (or just `make tests/foo/regen`) to save it as `checks.out`.
+
+Editing in Gitpod
+==================
+
+You can apply your edits directly from within your browser on [Gitpod](https://gitpod.io/#https://github.com/openSUSE/container-build-checks).
