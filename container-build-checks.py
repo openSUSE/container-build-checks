@@ -67,7 +67,7 @@ def verify_reference(image, result, value):
     if f"{repo}:{tag}" not in image.containerinfo["tags"]:
         tags = ", ".join(image.containerinfo["tags"])
         result.warn(f"The org.opensuse.reference label ({value}) does not refer to an existing tag ({tags})")
-    elif image.containerinfo["release"] not in tag:
+    elif "release" in image.containerinfo and image.containerinfo["release"] not in tag:
         result.warn(f"The org.opensuse.reference label ({value}) does not refer "
                     f"to a tag identifying a specific build")
 
@@ -191,7 +191,11 @@ def check_image(image, result):
         result.warn(f"Using manually defined repositories ({urls}) in the image. Only obsrepositories:/ is allowed.")
 
     # Make sure tags are namespaced and one of them contains the release
-    print(f"Release: {image.containerinfo['release']}")
+    if "release" in image.containerinfo:
+        print(f"Release: {image.containerinfo['release']}")
+    else:
+        print("No release information found. Is this a local osc build? Further analysis might be misleading")
+
     releasetagfound = False
 
     allowed_tags = config["Tags"].getlist("Allowed")
@@ -206,7 +210,7 @@ def check_image(image, result):
         if blocked_pattern is not None:
             result.warn(f"Tag {tag} is not allowed (blocked by {blocked_pattern}).")
 
-        if image.containerinfo["release"] in tag:
+        if "release" in image.containerinfo and image.containerinfo["release"] in tag:
             releasetagfound = True
 
     if not releasetagfound:
