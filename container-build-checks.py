@@ -46,6 +46,10 @@ class LabelInfo:
 
 
 def verify_disturl(image, result, value):
+    if "disturl" not in image.containerinfo:
+        print("No disturl in containerinfo, local build?")
+        return
+
     if value != image.containerinfo["disturl"]:
         result.error("org.openbuildservice.disturl not set correctly, bug in OBS?")
 
