@@ -1,0 +1,11 @@
+Looking at local-proper-derived.containerinfo
+Hint: No release and disturl found in containerinfo, probably a local osc build. Further analysis might be misleading.
+Tag: opensuse/example:latest
+Tag: opensuse/example:5.7
+Tag: opensuse/example:5.7.7.21
+Tag: kubic/testtag:latest
+Detected image specific label prefix: org.opensuse.example
+Hint: No disturl in containerinfo, local build?
+
+container-build-checks done. Hints: 2 Warnings: 0 Errors: 0
+Exited with 0
