@@ -22,6 +22,7 @@ class Image:
             raise Exception("Manifest doesn't have exactly one entry")
 
         self.config = json.load(self.tarfile.extractfile(self.manifest[0]["Config"]))
+        self.is_local_build = "release" not in containerinfo and "disturl" not in containerinfo
 
 
 class LabelInfo:
@@ -46,8 +47,11 @@ class LabelInfo:
 
 
 def verify_disturl(image, result, value):
-    if "disturl" not in image.containerinfo:
-        print("No disturl in containerinfo, local build?")
+    if "disturl" not in image.containerinfo and image.is_local_build:
+        result.hint("No disturl in containerinfo, local build?")
+        return
+    elif "disturl" not in image.containerinfo:
+        result.error("No disturl in containerinfo, but apparently not a local build.")
         return
 
     if value != image.containerinfo["disturl"]:
@@ -189,6 +193,10 @@ def match_patterns(needle, patterns):
 
 def check_image(image, result):
     """Perform checks on the given image"""
+    if image.is_local_build:
+        result.hint("No release and disturl found in containerinfo, probably a local osc build. "
+                    "Further analysis might be misleading.")
+
     # No manually defined repos which could escape the defined paths in e.g. openSUSE:Factory
     if "repos" in image.containerinfo and image.containerinfo["repos"] != [{"url": "obsrepositories:/"}]:
         urls = ", ".join([repo["url"] for repo in image.containerinfo["repos"]])
@@ -197,8 +205,8 @@ def check_image(image, result):
     # Make sure tags are namespaced and one of them contains the release
     if "release" in image.containerinfo:
         print(f"Release: {image.containerinfo['release']}")
-    else:
-        print("No release information found. Is this a local osc build? Further analysis might be misleading")
+    elif not image.is_local_build:
+        result.error("No release in containerinfo, but apparently not a local build.")
 
     releasetagfound = False
 
@@ -217,7 +225,7 @@ def check_image(image, result):
         if "release" in image.containerinfo and image.containerinfo["release"] in tag:
             releasetagfound = True
 
-    if not releasetagfound:
+    if not releasetagfound and not image.is_local_build:
         result.warn("None of the tags are unique to a specific build of the image.\n" +
                     "Make sure that at least one tag contains the release.")
 

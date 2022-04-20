@@ -12,6 +12,7 @@ install: container-build-checks.py
 
 # Some test containers depend on other test containers. Make sure those are built first.
 tests/proper-derived/built: tests/proper-base/built
+tests/local-proper-derived/built: tests/proper-base/built
 
 # Build the Dockerfile and create the tarball
 tests/%/built: tests/%/Dockerfile
