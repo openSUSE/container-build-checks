@@ -14,14 +14,23 @@ import tarfile
 
 class Image:
     """Information about the image to be tested."""
-    def __init__(self, containerinfo, tarfile):
-        self.containerinfo = containerinfo
-        self.tarfile = tarfile
-        self.manifest = json.load(tar.extractfile("manifest.json"))
-        if len(self.manifest) != 1:
-            raise Exception("Manifest doesn't have exactly one entry")
 
-        self.config = json.load(self.tarfile.extractfile(self.manifest[0]["Config"]))
+    def __init__(self, containerinfo, tar):
+        self.containerinfo = containerinfo
+        self.tarfile = tar
+        if "oci-layout" in self.tarfile.getnames():
+            self.index = json.load(tar.extractfile("index.json"))
+            if len(self.index["manifests"]) != 1:
+                raise Exception("OCI index doesn't have exactly one entry")
+            manifest = "blobs/" + self.index["manifests"][0]["digest"].replace(":", "/")
+            self.manifest = json.load(tar.extractfile(manifest))
+            config = "blobs/" + self.manifest["config"]["digest"].replace(":", "/")
+        else:
+            self.manifest = json.load(tar.extractfile("manifest.json"))
+            if len(self.manifest) != 1:
+                raise Exception("Manifest doesn't have exactly one entry")
+            config = self.manifest[0]["Config"]
+        self.config = json.load(self.tarfile.extractfile(config))
         self.is_local_build = "release" not in containerinfo and "disturl" not in containerinfo
 
 

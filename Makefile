@@ -13,9 +13,21 @@ install: container-build-checks.py
 # Some test containers depend on other test containers. Make sure those are built first.
 tests/broken-derived/built: tests/proper-base/built
 tests/proper-derived/built: tests/proper-base/built
+tests/oci-proper-derived/built: tests/oci-proper-base/built
 tests/local-proper-derived/built: tests/proper-base/built
 
 # Build the Dockerfile and create the tarball
+tests/oci-%/built: tests/%/Dockerfile
+	@dir=$$(dirname $@)
+	pushd $$dir >/dev/null
+	testname=$$(basename $$dir)
+	echo Building OCI $$testname
+	# Build the container
+	podman build --squash -t "c-b-c-tests/$$testname" .
+	podman push "c-b-c-tests/$$testname" oci-archive:$$testname.tar
+	popd >/dev/null
+	touch $@
+
 tests/%/built: tests/%/Dockerfile
 	@dir=$$(dirname $@)
 	pushd $$dir >/dev/null

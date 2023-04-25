@@ -1,0 +1,9 @@
+Looking at oci-proper-base.containerinfo
+Release: 14.19
+Tag: opensuse/tumbleweed:latest
+Tag: opensuse/tumbleweed:20210519
+Tag: opensuse/tumbleweed:20210519.14.19
+Detected image specific label prefix: org.opensuse.base
+
+container-build-checks done. Hints: 0 Warnings: 0 Errors: 0
+Exited with 0
