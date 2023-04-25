@@ -1,0 +1,15 @@
+FROM c-b-c-tests/oci-proper-base
+LABEL io.buildah.version="1.20.1"
+LABEL org.openbuildservice.disturl="obs://build.opensuse.org/home:favogt:container-checks/containerfile/e6f02b3d61214e205f11d1c2075b14cc-dockerfile-application-container"
+LABEL org.opencontainers.image.created="2021-05-21T14:28:22.338350130Z"
+LABEL org.opencontainers.image.description="This contains nano 5.7"
+LABEL org.opencontainers.image.title="Example container"
+LABEL org.opencontainers.image.version="5.7"
+LABEL org.opensuse.example.created="2021-05-21T14:28:22.338350130Z"
+LABEL org.opensuse.example.description="This contains nano 5.7"
+LABEL org.opensuse.example.disturl="obs://build.opensuse.org/home:favogt:container-checks/containerfile/e6f02b3d61214e205f11d1c2075b14cc-dockerfile-application-container"
+LABEL org.opensuse.example.reference="registry.opensuse.org/opensuse/example:5.7.7.21"
+LABEL org.opensuse.example.title="Example container"
+LABEL org.opensuse.example.version="5.7"
+LABEL org.opensuse.reference="registry.opensuse.org/opensuse/example:5.7.7.21"
+COPY some-file /some-file

@@ -1,0 +1,31 @@
+{
+   "buildtime" : 1621607310,
+   "disturl" : "obs://build.opensuse.org/home:favogt:container-checks/containerfile/e6f02b3d61214e205f11d1c2075b14cc-dockerfile-application-container",
+   "file" : "oci-proper-derived.tar",
+   "goarch" : "amd64",
+   "goos" : "linux",
+   "imageid" : "df309d498c093685243d9d945f368076d88bb6bd181640fae752bf800c3cef09",
+   "release" : "7.21",
+   "repos" : [
+      {
+         "url" : "obsrepositories:/"
+      }
+   ],
+   "tags" : [
+      "opensuse/example:latest",
+      "opensuse/example:5.7",
+      "opensuse/example:5.7.7.21",
+      "kubic/testtag:latest"
+   ],
+   "tar_blobids" : [
+      "sha256:43e763c1a9ac8eaa809d77c4ad0c543d78a826ba9d811eae19624c31e799fd1c",
+      "sha256:a0ea0ce79dfa175149b9f715342e13a9472ee6bfaeccfd4ecc6827f2494aef18",
+      "sha256:df309d498c093685243d9d945f368076d88bb6bd181640fae752bf800c3cef09"
+   ],
+   "tar_manifest" : "[{\"Config\":\"sha256:df309d498c093685243d9d945f368076d88bb6bd181640fae752bf800c3cef09\",\"RepoTags\":[\"opensuse/example:latest\",\"opensuse/example:5.7\",\"opensuse/example:5.7.7.21\"],\"Layers\":[\"sha256:a0ea0ce79dfa175149b9f715342e13a9472ee6bfaeccfd4ecc6827f2494aef18\",\"sha256:43e763c1a9ac8eaa809d77c4ad0c543d78a826ba9d811eae19624c31e799fd1c\"]}]",
+   "tar_md5sum" : "72c8bfea4f24b5954cea7b788093e25c",
+   "tar_mtime" : 1621607315,
+   "tar_sha256sum" : "ee6344740bd7c23a9e4b9f2b5ff031b95566a0a7613ff082ed3a856a5559e297",
+   "tar_size" : 40647680,
+   "version" : "5.7"
+}

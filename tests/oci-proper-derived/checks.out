@@ -1,0 +1,10 @@
+Looking at oci-proper-derived.containerinfo
+Release: 7.21
+Tag: opensuse/example:latest
+Tag: opensuse/example:5.7
+Tag: opensuse/example:5.7.7.21
+Tag: kubic/testtag:latest
+Detected image specific label prefix: org.opensuse.example
+
+container-build-checks done. Hints: 0 Warnings: 0 Errors: 0
+Exited with 0
