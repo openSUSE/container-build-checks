@@ -11,6 +11,7 @@ install: container-build-checks.py
 	install -Dm0755 container-build-checks.py $(DESTDIR)/usr/lib/build/post-build-checks/container-build-checks
 
 # Some test containers depend on other test containers. Make sure those are built first.
+tests/broken-derived/built: tests/proper-base/built
 tests/proper-derived/built: tests/proper-base/built
 tests/local-proper-derived/built: tests/proper-base/built
 
