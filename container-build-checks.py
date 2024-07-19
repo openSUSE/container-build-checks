@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2021 SUSE LLC
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from pathlib import Path
 import configparser
 import fnmatch
 import glob
@@ -286,8 +287,7 @@ for containerinfo in containerinfos():
         ci_dict = json.load(cifile)
 
     # Open the tarball and look inside
-    dir = os.path.dirname(os.path.realpath(containerinfo))
-    with tarfile.open(f"{dir}/{ci_dict['file']}") as tar:
+    with tarfile.open(Path(containerinfo).resolve().parent / ci_dict['file']) as tar:
         image = Image(ci_dict, tar)
         check_image(image, result)
         print()
