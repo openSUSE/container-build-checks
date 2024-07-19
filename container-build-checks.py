@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# SPDX-FileCopyrightText: 2021 SUSE LLC
+# SPDX-FileCopyrightText: 2021,2024 SUSE LLC
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from pathlib import Path
@@ -79,8 +79,11 @@ def verify_reference(image, result, value):
         return
 
     (registry, repo, tag) = reference_match.groups()
-    if config["General"]["Registry"] and registry != config["General"]["Registry"]:
-        result.warn(f"The org.opensuse.reference label ({value}) does not refer to {config['General']['Registry']}")
+    allowed_registries: list[str] = config["General"].getlist("Registry")
+    if len(allowed_registries) and registry not in allowed_registries:
+        result.warn(
+            f"The org.opensuse.reference label ({value}) does not use an "
+            f"allowed registry: {','.join(allowed_registries)}")
 
     if f"{repo}:{tag}" not in image.containerinfo["tags"]:
         tags = ", ".join(image.containerinfo["tags"])
