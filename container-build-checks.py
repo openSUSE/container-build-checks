@@ -71,6 +71,9 @@ def verify_disturl(image, result, value):
 # Split a reference (e.g. registry.opensuse.org/foo/bar:tag01) into (registry, repo, tag)
 REFERENCE_RE = re.compile("([^/]+)/([^:]+):([^:]+)")
 
+# Search for substitution patterns like %FOO% in label values
+LABEL_SUB_RE = re.compile("%([A-Za-z0-9_]+)%")
+
 
 def verify_reference(image, result, value):
     reference_match = REFERENCE_RE.fullmatch(value)
@@ -150,6 +153,11 @@ def check_labels(image, result):
     # Treat this specially, it is usually not set manually
     if "org.openbuildservice.disturl" not in labels:
         result.error("org.openbuildservice.disturl not set correctly, bug in OBS?")
+
+    # Reject labels like "something-%foo%" or "%foo%-something"
+    for (label_name, label_value) in labels.items():
+        if LABEL_SUB_RE.search(label_value):
+            result.error(f"Label {label_name} = {label_value} appears to be missing substitution?")
 
     # Get the image specific label prefix by looking at the .reference
     labelprefix = None
