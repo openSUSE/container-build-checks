@@ -1,0 +1,30 @@
+{
+   "buildtime" : 1621470206,
+   "disturl" : "obs://build.opensuse.org/openSUSE:Factory/images/e1b24f5d6cbf69cb7f8208acb618a4fe-opensuse-tumbleweed-image:docker",
+   "file" : "label-checks.tar",
+   "goarch" : "amd64",
+   "goos" : "linux",
+   "imageid" : "11ea66ecb7888f020cd84d080ad417a7d4f02f74361cd1c2a4b4c70ffb0e9d78",
+   "name" : "opensuse-tumbleweed-image",
+   "release" : "14.19",
+   "repos" : [
+      {
+         "url" : "obsrepositories:/"
+      }
+   ],
+   "tags" : [
+      "opensuse/tumbleweed:latest",
+      "opensuse/tumbleweed:20210519",
+      "opensuse/tumbleweed:20210519.14.19"
+   ],
+   "tar_blobids" : [
+      "sha256:11ea66ecb7888f020cd84d080ad417a7d4f02f74361cd1c2a4b4c70ffb0e9d78",
+      "sha256:89a8c2a08e572bfd8ef8eb05648638443f0d50e4c9e9913f01adbeb2e89ec9cd"
+   ],
+   "tar_manifest" : "[{\"Config\":\"sha256:11ea66ecb7888f020cd84d080ad417a7d4f02f74361cd1c2a4b4c70ffb0e9d78\",\"RepoTags\":[\"opensuse/tumbleweed:latest\",\"opensuse/tumbleweed:20210519\",\"opensuse/tumbleweed:20210519.14.19\"],\"Layers\":[\"sha256:89a8c2a08e572bfd8ef8eb05648638443f0d50e4c9e9913f01adbeb2e89ec9cd\"]}]",
+   "tar_md5sum" : "eb472571d516e44c1c05dc73a47f61e7",
+   "tar_mtime" : 1621470212,
+   "tar_sha256sum" : "7e8b9aaad5222b8680f17ffcf4c7f514783d86e3193b7f925c066a14113080de",
+   "tar_size" : 36567552,
+   "version" : "1.0.4"
+}

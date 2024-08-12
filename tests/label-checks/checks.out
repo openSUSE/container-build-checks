@@ -1,0 +1,12 @@
+Looking at label-checks.containerinfo
+Release: 14.19
+Tag: opensuse/tumbleweed:latest
+Tag: opensuse/tumbleweed:20210519
+Tag: opensuse/tumbleweed:20210519.14.19
+Error: Label org.opencontainers.image.version = 20210519.%RELEASETYPO% appears to be missing substitution?
+Error: Label org.opensuse.base.version = 20210519.%RELEASETYPO% appears to be missing substitution?
+Detected image specific label prefix: org.opensuse.base
+
+container-build-checks done. Hints: 0 Warnings: 0 Errors: 2
+Fatal errors found.
+Exited with 1

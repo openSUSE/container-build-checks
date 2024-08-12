@@ -1,0 +1,18 @@
+FROM scratch
+LABEL org.openbuildservice.disturl="obs://build.opensuse.org/openSUSE:Factory/images/e1b24f5d6cbf69cb7f8208acb618a4fe-opensuse-tumbleweed-image:docker"
+LABEL org.opencontainers.image.created="2021-05-20T00:23:03.624005870Z"
+LABEL org.opencontainers.image.description="Image that is 100% based on openSUSE Tumbleweed."
+LABEL org.opencontainers.image.title="openSUSE Tumbleweed Base Container"
+LABEL org.opencontainers.image.url="https://www.opensuse.org/"
+LABEL org.opencontainers.image.vendor="openSUSE Project"
+LABEL org.opencontainers.image.version="20210519.%RELEASETYPO%"
+LABEL org.opensuse.base.created="2021-05-20T00:23:03.624005870Z"
+LABEL org.opensuse.base.description="Image that is 100% based on openSUSE Tumbleweed."
+LABEL org.opensuse.base.disturl="obs://build.opensuse.org/openSUSE:Factory/images/e1b24f5d6cbf69cb7f8208acb618a4fe-opensuse-tumbleweed-image:docker"
+LABEL org.opensuse.base.reference="registry.opensuse.org/opensuse/tumbleweed:20210519.14.19"
+LABEL org.opensuse.base.title="openSUSE Tumbleweed Base Container"
+LABEL org.opensuse.base.url="https://www.opensuse.org/"
+LABEL org.opensuse.base.vendor="openSUSE Project"
+LABEL org.opensuse.base.version="20210519.%RELEASETYPO%"
+LABEL org.opensuse.reference="registry.opensuse.org/opensuse/tumbleweed:20210519.14.19"
+COPY some-file /some-file
