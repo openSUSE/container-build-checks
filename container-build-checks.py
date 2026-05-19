@@ -25,6 +25,12 @@ class Image:
                 raise Exception("OCI index doesn't have exactly one entry")
             manifest = "blobs/" + self.index["manifests"][0]["digest"].replace(":", "/")
             self.manifest = json.load(tar.extractfile(manifest))
+            if "config" not in self.manifest:
+                manifest2 = "blobs/" + self.manifest["manifests"][0]["digest"].replace(
+                    ":", "/"
+                )
+                self.manifest = json.load(tar.extractfile(manifest2))
+
             config = "blobs/" + self.manifest["config"]["digest"].replace(":", "/")
         else:
             self.manifest = json.load(tar.extractfile("manifest.json"))
