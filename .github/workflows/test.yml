@@ -9,25 +9,21 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-20.04
-            # Version in SLE 15
-            python: "3.6"
-          - os: ubuntu-latest
-            # Version in openSUSE Tumbleweed
-            python: "3.11"
-    runs-on: ${{ matrix.os }}
+          # SLE and Leap 15.x uses python 3.6
+          - container: registry.opensuse.org/opensuse/leap:15.6
+          # SLE 16.0 uses python 3.13
+          - container: registry.suse.com/bci/bci-base:16.0
+          # TW uses python 3.13 (as of this writing)
+          - container: registry.opensuse.org/opensuse/tumbleweed
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.container }}
+      options: --privileged
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: |
-        pip3 install --upgrade pip
-        pip3 install flake8
-        sudo apt update
-        sudo apt install -y podman
+        zypper in -y diffutils gzip make tar podman python3-flake8
+    - uses: actions/checkout@v6
     - name: Lint
       run: make lint
     - name: Test
