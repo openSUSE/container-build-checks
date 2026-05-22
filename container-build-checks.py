@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# SPDX-FileCopyrightText: 2021,2024 SUSE LLC
+# SPDX-FileCopyrightText: 2026 SUSE LLC
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from pathlib import Path
@@ -16,23 +16,64 @@ import tarfile
 class Image:
     """Information about the image to be tested."""
 
+    def _ociResolveDigest(self, digest):
+        """Given the digest, return a path to the blob"""
+        return "blobs/" + digest.replace(":", "/")
+
+    def _ociManifestsFromIndex(self, indexFilename):
+        """Given the filename of a OCI image index JSON,
+           collect all referenced manifests. Returns an array."""
+        allManifests = []
+        index = json.load(self.tarfile.extractfile(indexFilename))
+        for manifest in index["manifests"]:
+            if manifest["mediaType"] == "application/vnd.oci.image.index.v1+json":  # Nested index
+                indexPath = self._ociResolveDigest(manifest["digest"])
+                allManifests += self._ociManifestsFromIndex(indexPath)
+            elif manifest["mediaType"] == "application/vnd.oci.image.manifest.v1+json":
+                manifestPath = self._ociResolveDigest(manifest["digest"])
+                allManifests += [manifestPath]
+            else:
+                raise Exception(f"Unsupported mediaType {manifest['mediaType']}")
+
+        return allManifests
+
     def __init__(self, containerinfo, tar):
         self.containerinfo = containerinfo
         self.tarfile = tar
+        self.manifest = None
+        self.config = None
+        self.is_local_build = "release" not in containerinfo and "disturl" not in containerinfo
+
         if "oci-layout" in self.tarfile.getnames():
-            self.index = json.load(tar.extractfile("index.json"))
-            if len(self.index["manifests"]) != 1:
-                raise Exception("OCI index doesn't have exactly one entry")
-            manifest = "blobs/" + self.index["manifests"][0]["digest"].replace(":", "/")
-            self.manifest = json.load(tar.extractfile(manifest))
-            config = "blobs/" + self.manifest["config"]["digest"].replace(":", "/")
+            # Iterate all manifests, find a usable one, hopefully just one.
+            for manifestPath in self._ociManifestsFromIndex("index.json"):
+                thisManifest = json.load(tar.extractfile(manifestPath))
+
+                # config format has to be known
+                if thisManifest["config"]["mediaType"] != "application/vnd.oci.image.config.v1+json":
+                    continue
+
+                # and look like something that can be run
+                configPath = self._ociResolveDigest(thisManifest["config"]["digest"])
+                thisConfig = json.load(tar.extractfile(configPath))
+                if thisConfig["os"] == "unknown" or len(thisConfig["config"].keys()) == 0:
+                    continue
+
+                if self.manifest is not None:
+                    raise Exception("Found more than one potential manifest")
+
+                self.manifest = thisManifest
+                self.config = thisConfig
+
+            if self.manifest is None:
+                raise Exception("No usable manifest found")
         else:
             self.manifest = json.load(tar.extractfile("manifest.json"))
             if len(self.manifest) != 1:
                 raise Exception("Manifest doesn't have exactly one entry")
-            config = self.manifest[0]["Config"]
-        self.config = json.load(self.tarfile.extractfile(config))
-        self.is_local_build = "release" not in containerinfo and "disturl" not in containerinfo
+
+            configPath = self.manifest[0]["Config"]
+            self.config = json.load(self.tarfile.extractfile(configPath))
 
 
 class LabelInfo:
